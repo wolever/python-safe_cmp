@@ -26,7 +26,7 @@ But there are many cases where it is useful to, for example:
   arbitrary input
 
 In fancy math terms, ``safe_cmp`` implements a total ordering of all values in
-Python 3[1]_.
+Python 3 [1]_.
 
 .. [1] More precisely, a total ordering *of all values which can be ordered*.
    This excludes ``NaN``, and any other values which are defined as having an
