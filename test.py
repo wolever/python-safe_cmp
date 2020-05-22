@@ -3,6 +3,8 @@ from parameterized import parameterized
 
 from safe_cmp import safe_order, safe_sorted, safe_min, safe_max, safe_cmp
 
+nan = float("nan")
+
 test_inputs = [
     (None, 1),
     (1, []),
@@ -76,3 +78,22 @@ def test_safe_min_max(input, func_exp, splat):
     func, expected = func_exp
     res = func(*input) if splat else func(input)
     assert_equal(res, input[expected])
+
+@parameterized([
+    (nan, nan, 0),
+    (1, nan, 1),
+    (nan, 1, -1),
+    (nan, None, 1),
+    (None, nan, -1),
+])
+def test_safe_cmp_nan(a, b, expected):
+    # ensure compat with Python 2 cmp
+    assert_equal(safe_cmp(a, b), expected)
+
+@parameterized([
+    ([nan, 2, nan, 1], [nan, 2, nan, 1]),
+    (["foo", None, nan], [None, nan, "foo"]),
+])
+def test_sorted_nan(input, expected):
+    # ensure compat with sorted
+    assert_equal(list(safe_sorted(input)), expected)

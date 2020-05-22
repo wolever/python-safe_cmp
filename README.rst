@@ -1,5 +1,5 @@
-``safe_cmp`` provides safe comparison operations (a total ordering) for any object in Python 3
-==============================================================================================
+``safe_cmp``: safe comparisons (total ordering) for any object in Python 3
+==========================================================================
 
 In Python 2, it was possible to compare any object::
 
@@ -25,21 +25,78 @@ But there are many cases where it is useful to, for example:
 * Write generic functions which will have robust, deterministic behaviour on
   arbitrary input
 
-In fancy math terms, ``safe_cmp`` implements a total ordering of all values in
-Python 3 [1]_.
+``safe_cmp`` provides functions for safely sorting and ordering any value in
+Python 3. In fancy math terms, ``safe_cmp`` implements a total ordering of all
+values in Python 3 [1]_.
 
-.. [1] More precisely, a total ordering *of all values which can be ordered*.
-   This excludes ``NaN``, and any other values which are defined as having an
-   undefined ordering.
+``safe_cmp`` implements Python 2 compatible safe versions of the ordering
+functions:
 
-``safe_cmp`` implements safe versions of:
-
-* ``safe_order``: a wrapper which defines a total ordering for any object (for
-  example, ``heterogeneous_list.sort(key=safe_order)``)
 * ``safe_cmp``: a Python 2 compatible implementation of ``cmp`` for Python 3
 * ``safe_sorted``: a safe version of ``sorted(...)``
 * ``safe_min``: a safe version of ``min(...)``
 * ``safe_max``: a safe version of ``max(...)``
+
+And provides a wrapper - ``safe_order`` - which defines a total ordering for
+any object (for example, ``heterogeneous_list.sort(key=safe_order)``).
+
+Examples
+--------
+
+Sorting a heterogeneous list:
+
+.. code-block:: python
+
+    >>> from safe_cmp import safe_sorted, safe_order
+    >>> items = [1, None, "foo", {}, object]
+    >>> list(safe_sorted(items)) # Using "safe_sorted"
+    [None, {}, 1, 'foo', object]
+    >>> items.sort(key=safe_order) # Using "safe_order" with key=
+    >>> items
+    [None, {}, 1, 'foo', object]
+
+Finding the max of a list which includes nulls:
+
+.. code-block:: python
+
+    >>> from safe_cmp import safe_max
+    >>> safe_max([1, None, 3, None, 4])
+    4
+
+The rare situation where Python 2 style ``cmp`` is useful:
+
+.. code-block:: python
+
+    >>> from safe_cmp import safe_cmp
+    >>> safe_cmp(None, 1)
+    -1
+    >>> safe_cmp(None, None)
+    0
+    >>> safe_cmp(1, None)
+    1
+
+Note: ``safe_cmp`` will produce Python 2 compatible results when called with
+``nan``:
+
+.. code-block:: python
+
+    >>> from safe_cmp import safe_cmp
+    >>> nan = float("NaN")
+    >>> safe_cmp(nan, 1)
+    -1
+    >>> safe_cmp(1, nan)
+    1
+    >>> safe_cmp(nan, nan)
+    0
+
+As will ``safe_sorted``:
+
+.. code-block:: python
+
+    >>> from safe_cmp import safe_sorted
+    >>> list(safe_sorted([nan, 2, nan, 1]))
+    [nan, 2, nan, 1]
+
 
 Performance
 -----------
@@ -67,3 +124,7 @@ straight forward to provide.
 
 Additionally, where obvious, performance optimizations have been implemented
 (for example, caching the result of ``key=`` functions).
+
+.. [1] More precisely, a total ordering *of all values which can be ordered*.
+   This excludes ``NaN``, and any other values which are defined as having an
+   undefined ordering.
