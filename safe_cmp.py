@@ -132,3 +132,10 @@ def safe_min(a, *rest, default=Undefined, key=None):
     if res is Undefined:
         raise ValueError("safe_min() arg is an empty sequence")
     return res
+
+def safe_sorted(iter, *, key=None, reverse=False):
+    if key is None:
+        use_key = safe_order
+    else:
+        use_key = lambda x: safe_order(key(x))
+    return sorted(iter, key=use_key, reverse=reverse)
