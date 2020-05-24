@@ -15,7 +15,7 @@ except IOError:
 
 setup(
     name="safe_cmp",
-    version="0.1.0",
+    version="0.1.1",
     url="https://github.com/wolever/python-safe_cmp",
     license="FreeBSD",
     author="David Wolever",
