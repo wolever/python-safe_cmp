@@ -1,6 +1,21 @@
 ``safe_cmp``: safe comparisons (total ordering) for any object in Python 3
 ==========================================================================
 
+``safe_cmp`` provides functions for safely sorting and ordering any value in
+Python 3. In fancy math terms, ``safe_cmp`` implements a total ordering of all
+values in Python 3 [1]_.
+
+Installation::
+
+    yarn add safe-cmp
+
+    - or -
+
+    pip install safe-cmp
+
+Description
+-----------
+
 In Python 2, it was possible to compare any object::
 
     >>> None > 2
@@ -17,17 +32,14 @@ But this is no longer true in Python 3::
     ...
     TypeError: '<' not supported between instances of 'list' and 'object'
 
-But there are many cases where it is useful to, for example:
+There are many cases when it can be convenient to safely compare arbitrary
+objects. For example:
 
 * Sort heterogeneous lists (ie, lists that contain many types of object)
 * Compare objects to ``None`` (for example, to find the ``max(...)`` of a list
   where some items may be ``None``)
 * Write generic functions which will have robust, deterministic behaviour on
   arbitrary input
-
-``safe_cmp`` provides functions for safely sorting and ordering any value in
-Python 3. In fancy math terms, ``safe_cmp`` implements a total ordering of all
-values in Python 3 [1]_.
 
 ``safe_cmp`` implements Python 2 compatible safe versions of the ordering
 functions:
@@ -103,7 +115,7 @@ Performance
 
 Currently ``safe_cmp`` methods are currently implemented in Python (in contrast
 to their unsafe builtin counterparts, which are implemented in C), so
-performance will notable worse for large comparisons::
+performance will be worse for large comparisons::
 
     In [1]: %timeit safe_max(range(10000000))
     2.8 s ± 42 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
@@ -111,7 +123,7 @@ performance will notable worse for large comparisons::
     In [2]: %timeit max(range(10000000))
     345 ms ± 6.23 ms per loop (mean ± std. dev. of 7 runs, 1 loop each)
 
-For smaller comparisons, though, the difference will be negligible::
+For smaller comparisons, hoever, the difference is negligible::
 
     In [1]: %timeit safe_max(1, 2)
     682 ns ± 7.12 ns per loop (mean ± std. dev. of 7 runs, 1000000 loops each)
@@ -119,8 +131,8 @@ For smaller comparisons, though, the difference will be negligible::
     In [2]: %timeit max(1, 2)
     218 ns ± 6.87 ns per loop (mean ± std. dev. of 7 runs, 1000000 loops each)
 
-If there is interest in performant implementations, however, they will be
-straight forward to provide.
+If there is interest in performant implementations they will be straight
+forward to implement.
 
 Additionally, where obvious, performance optimizations have been implemented
 (for example, caching the result of ``key=`` functions).
