@@ -49,9 +49,16 @@ def safe_cmp(a, b, _nan_is_eq=False):
 
     typ_a = type(a)
     typ_b = type(b)
+
+    # In rare cases where a value cannot be compared to another value of the
+    # same type - like complex numbers - also include the memory location of
+    # the value so *some* ordering is defined.
+    last_a = id(a) if typ_a is typ_b else None
+    last_b = id(b) if typ_a is typ_b else None
+
     return safe_cmp(
-        (typ_a.__name__, id(typ_a)),
-        (typ_b.__name__, id(typ_b)),
+        (typ_a.__name__, id(typ_a), last_a),
+        (typ_b.__name__, id(typ_b), last_b),
     )
 
 def _build_comperator(name, op, lt, eq, gt):

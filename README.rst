@@ -3,7 +3,7 @@
 
 ``safe_cmp`` provides functions for safely sorting and ordering any value in
 Python 3. In fancy math terms, ``safe_cmp`` implements a total ordering of all
-values in Python 3 [1]_.
+values in Python 3.
 
 Installation::
 
@@ -41,8 +41,8 @@ objects. For example:
 * Write generic functions which will have robust, deterministic behaviour on
   arbitrary input
 
-``safe_cmp`` implements Python 2 compatible safe versions of the ordering
-functions:
+``safe_cmp`` implements Python 2 (mostly; see `Python 2 Compatibility`_)
+compatible safe versions of the ordering functions:
 
 * ``safe_cmp``: a Python 2 compatible implementation of ``cmp`` for Python 3
 * ``safe_sorted``: a safe version of ``sorted(...)``
@@ -110,6 +110,75 @@ As will ``safe_sorted``:
     [nan, 2, nan, 1]
 
 
+Values Without A Defined Ordering
+---------------------------------
+
+Values without a naturally defined ordering - complex numbers, certain
+user-defined types, etc - will be ordered in terms of their type name and
+location in memory.
+
+Specifically, the default ordering is defined as::
+
+    def default_ordering(obj):
+        return (type(obj).__name__, id(type(obj)), id(obj))
+
+Note: for Python 2 compatibility, ``None`` and ``NaN`` are handled as special
+cases. See `the implementation of safe_cmp`_ for details.
+
+.. _the implementation of safe_cmp: https://github.com/wolever/python-safe_cmp/blob/master/safe_cmp/safe_cmp.py#L7
+
+Another special case worth noting is sets, which *implicitly* have no defined
+ordering in Python 3:
+
+.. code-block:: python
+
+    >>> a = set([1])
+    >>> b = set([2])
+    >>> a < b
+    False
+    >>> b < a
+    False
+
+``safe_cmp`` does not attempt to detect or correct this behavior for sets (or
+any other type with an implicitly defined lack of ordering):
+
+.. code-block:: python
+
+    >>> from safe_cmp import safe_cmp
+    >>> a = set([1])
+    >>> b = set([2])
+    >>> safe_cmp(a, b)
+    1
+    >>> safe_cmp(a, b)
+    1
+
+
+Python 2 Compatibility
+----------------------
+
+``safe_cmp`` and friends are compatible with their Python 2 counterparts in
+their dealings with ``NaN`` and ``None``, but differ in their handling of types
+such as sets and complex numbers which are explicitly unorderable in Python 2:
+
+.. code-block:: python
+
+    >>> 1j > 2j
+    ...
+    TypeError: no ordering relation is defined for complex numbers
+    >>> cmp(set(), set())
+    TypeError: cannot compare sets using cmp()
+
+Contrast with ``safe_cmp``:
+
+.. code-block:: python
+
+    >>> from safe_cmp import safe_cmp
+    >>> safe_cmp(1j, 2j)
+    -1
+    >>> safe_cmp(set(), set())
+    0
+
+
 Performance
 -----------
 
@@ -136,7 +205,3 @@ forward to implement.
 
 Additionally, where obvious, performance optimizations have been implemented
 (for example, caching the result of ``key=`` functions).
-
-.. [1] More precisely, a total ordering *of all values which can be ordered*.
-   This excludes ``NaN``, and any other values which are defined as having an
-   undefined ordering.

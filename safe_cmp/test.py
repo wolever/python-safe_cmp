@@ -12,6 +12,7 @@ test_inputs = [
     (None, object()),
     (1, object()),
     (1, 2),
+    (1j, 2j),
 ]
 
 test_comparisons = [
